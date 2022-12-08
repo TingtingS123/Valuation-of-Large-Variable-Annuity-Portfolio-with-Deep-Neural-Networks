@@ -1,0 +1,125 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+library(data.tree)
+require( data.tree )
+hkmeans <- function(X,k){
+  res <- Node$new ( "Node 0" )
+  
+  nCount <- 0
+  tmp <- kmeans (X , 2)
+  for ( i in 1:2) {
+    nCount <- nCount + 1
+    nodeA <- res$AddChild( paste ( "Node" ,        nCount ) )
+    nodeA$members <- names( which ( tmp$cluster     == i ) )
+    nodeA$size <- length( nodeA$members )
+    nodeA$center <- tmp$centers[i ,]
+    }
+
+  while(TRUE){
+    vSize <- res$Get( "size" , filterFun =         isLeaf )
+    if ( length( vSize ) >= k ) {
+      break
+    }
+    maxc <- which ( vSize == max ( vSize ) )
+    nodeL <- FindNode( res , names( maxc ) )
+    tmp <- kmeans( X[ nodeL$members ,] , 2)
+    for ( i in 1:2) {
+      nCount <- nCount + 1
+      nodeA <- nodeL$AddChild( paste ( "Node" ,       nCount ) )
+      nodeA$members <- names( which ( tmp$cluster == i ) )
+      nodeA$size <- length( nodeA$members )
+      nodeA$center <- tmp$centers [i ,]
+}
+}
+  return( res )
+}
+```
+
+```{r}
+inforce <- read.csv ( "/Users/suntingting/Dropbox/Synthetic data/vamc/datasets/inforce.csv" )
+```
+
+
+```{r}
+vNames <- c ( "gbAmt" , "gmwbBalance" , "withdrawal" ,paste ( "FundValue" , 1:10 , sep = "" ) )
+age <- with ( inforce , ( currentDate - birthDate ) / 365)
+ttm <- with ( inforce , ( matDate - currentDate ) / 365)
+datN <- cbind ( inforce [ ,vNames] , data.frame (age = age,ttm = ttm) )
+datC <- inforce [ , c ( "gender" , "productType" ) ]
+
+dat <- cbind(datN,datC)
+dat$gender = as.factor(dat$gender)
+dat$productType = as.factor(dat$productType)
+```
+
+
+```{r}
+X <- model.matrix ( ~ . , data = dat )[ , -1]
+vMin <- apply (X , 2 , min )
+vMax <- apply (X , 2 , max )
+X <- ( X - matrix ( vMin , nrow = nrow(X) , ncol    = ncol(X) ,byrow = TRUE ))/matrix(vMax - vMin , nrow = nrow( X ) , ncol =ncol( X ) , byrow = TRUE )
+
+```
+
+```{r}
+set.seed(123)
+{
+t1 <- proc.time()
+res <- hkmeans(X,340)
+proc.time() - t1
+}  
+```
+
+```{r}
+set.seed(123)
+{
+t1 <- proc.time()
+res <- hkmeans(X,680)
+proc.time() - t1
+}  
+```
+```{r}
+set.seed(123)
+{
+t1 <- proc.time()
+res <- hkmeans(X,170)
+proc.time() - t1
+}  
+```
+```{r}
+findPolicy <- function( node , X ) {
+  z <- node$center
+  vD <- apply( ( X [ node$members,]-matrix (z   , nrow = node$size , ncol = length ( z ) , byrow=T))^2 , 1 , sum)
+  iMin <- which ( vD == min (vD) )
+  node$policy <- node$members [iMin]
+  } 
+res$Do(findPolicy,filterFun = isLeaf , X = X )
+```
+
+```{r}
+vInd <- res$Get( "policy" , filterFun = isLeaf )
+vInd <- sort ( as.numeric ( vInd ) )
+print ( unname ( vInd [1:50]) )
+```
+```{r}
+
+data <- read.csv ( "/Users/suntingting/Dropbox/Synthetic data/VariableAnnuity_reduction.csv" )
+dat_340_Hkmeans = data[vInd,]
+write.csv(dat_340_Hkmeans,"/Users/suntingting/Dropbox/Synthetic data/dat_170_Hkmeans.csv")
+
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
