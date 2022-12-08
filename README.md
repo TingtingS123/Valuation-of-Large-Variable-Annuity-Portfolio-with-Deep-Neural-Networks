@@ -26,4 +26,4 @@ Distributed under the MIT License. See LICENSE.txt for more information.
 # Contact
 Tingting Sun - @your_twitter - ts7f@mtmail.mtsu.edu
 
-Project Link: https://github.com/TingtingS123/CSCI7850/edit/main/README.md
+Project Link: https://github.com/TingtingS123/CSCI7850/blob/main/project.ipynb
