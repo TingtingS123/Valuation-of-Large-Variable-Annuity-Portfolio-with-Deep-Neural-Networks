@@ -1,11 +1,16 @@
 # Prerequisites
-We need the following packages: numpy, pandas, tensorflow
+
+We need the following packages for Python: numpy, pandas, tensorflow
 
 pip install tensorflow
 
 pip install numpy
 
 pip install pandas
+
+We need the following packages for R: lattice, survival,Formula,ggplot2,Hmisc,data.tree
+
+install.packages(c('lattice',' survival','Formula','ggplot2','Hmisc','data.tree''))
 
 # Dataset
 
