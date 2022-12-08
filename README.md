@@ -24,6 +24,6 @@ https://csci7850.fra1.digitaloceanspaces.com/dataset/inforce.csv
 Distributed under the MIT License. See LICENSE.txt for more information.
 
 # Contact
-Tingting Sun - @your_twitter - ts7f@mtmail.mtsu.edu
+Tingting Sun - ts7f@mtmail.mtsu.edu
 
 Project Link: https://github.com/TingtingS123/CSCI7850/blob/main/project.ipynb
